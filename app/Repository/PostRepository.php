@@ -11,7 +11,7 @@ class PostRepository
         return Post::all();
     }
 
-    public function findById(int $id)
+    public function findById(int $id): Post
     {
         return Post::query()->findOrFail($id);
     }
