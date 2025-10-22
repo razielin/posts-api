@@ -8,4 +8,9 @@ Route::group([
 ], function () {
     Route::get('/posts', [PostController::class, 'allPosts']);
     Route::get('/posts/{id}', [PostController::class, 'getPost']);
+    Route::post('/post', [PostController::class, 'createPost']);
+
+    Route::get('/token', function () {
+        return csrf_token();
+    });
 });

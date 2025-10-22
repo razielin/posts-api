@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -39,5 +40,22 @@ class Post extends Model
         'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
+
+    public function setTitleAndSlug(string $title): void
+    {
+        $this->title = $title;
+        $this->slug = Str::slug($title);
+    }
+
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
+
+    public function publish(): void
+    {
+        $this->is_published = true;
+        $this->published_at = now();
+    }
 
 }

@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Post;
+use App\Http\Requests\CreatePostRequest;
 use App\Repository\PostRepository;
 
 class PostController extends Controller
@@ -18,5 +18,11 @@ class PostController extends Controller
     public function getPost(int $id)
     {
         return $this->successJson($this->postRepository->findById($id));
+    }
+
+    public function createPost(CreatePostRequest $request)
+    {
+        $post = $this->postRepository->create($request->title, $request->content, $request->is_published);
+        return $this->successJson($post);
     }
 }

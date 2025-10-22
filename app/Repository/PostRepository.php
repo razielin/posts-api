@@ -15,4 +15,17 @@ class PostRepository
     {
         return Post::query()->findOrFail($id);
     }
+
+    public function create(string $title, string $content, bool $published): Post
+    {
+        $post = new Post();
+        $post->setTitleAndSlug($title);
+        $post->setContent($content);
+        if ($published) {
+            $post->publish();
+        }
+        $post->save();
+        $post->refresh();
+        return $post;
+    }
 }
