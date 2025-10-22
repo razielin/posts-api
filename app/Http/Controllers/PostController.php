@@ -22,7 +22,7 @@ class PostController extends Controller
         try {
             return $this->successJson($this->postRepository->findById($id));
         } catch (ModelNotFoundException $e) {
-            return $this->notFoundJson();
+            return $this->notFoundJson($e);
         }
     }
 
@@ -43,7 +43,17 @@ class PostController extends Controller
             );
             return $this->successJson($post);
         } catch (ModelNotFoundException $e) {
-            return $this->notFoundJson();
+            return $this->notFoundJson($e);
+        }
+    }
+
+    public function deletePost(int $id)
+    {
+        try {
+            $this->postRepository->delete($id);
+            return $this->successJson(['message' => 'Post deleted successfully']);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundJson($e);
         }
     }
 }

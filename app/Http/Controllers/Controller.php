@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 abstract class Controller
 {
@@ -11,11 +11,12 @@ abstract class Controller
         return response()->json(['success' => true, 'data' => $data]);
     }
 
-    protected function notFoundJson()
+    protected function notFoundJson(ModelNotFoundException $e)
     {
+        $idsString = implode(',', $e->getIds());
         return response()->json([
             'success' => false,
-            'message' => 'Entity not found'
+            'message' => "Entity #$idsString not found"
         ], 404);
     }
 }

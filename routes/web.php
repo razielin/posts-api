@@ -10,6 +10,7 @@ Route::group([
     Route::get('/posts/{id}', [PostController::class, 'getPost']);
     Route::post('/posts', [PostController::class, 'createPost']);
     Route::put('/posts/{id}', [PostController::class, 'editPost']);
+    Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
 
     Route::get('/token', function () {
         return csrf_token();

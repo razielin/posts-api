@@ -30,6 +30,12 @@ class PostRepository
         return $post;
     }
 
+    public function delete(int $id): void
+    {
+        $post = $this->findById($id);
+        $post->delete();
+    }
+
     private function setPostData(Post $post, string $title, string $content, bool $published): void
     {
         $post->setTitleAndSlug($title);
