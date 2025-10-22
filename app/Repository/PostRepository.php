@@ -19,6 +19,19 @@ class PostRepository
     public function create(string $title, string $content, bool $published): Post
     {
         $post = new Post();
+        $this->setPostData($post, $title, $content, $published);
+        return $post;
+    }
+
+    public function update(int $id, string $title, string $content, bool $published): Post
+    {
+        $post = $this->findById($id);
+        $this->setPostData($post, $title, $content, $published);
+        return $post;
+    }
+
+    private function setPostData(Post $post, string $title, string $content, bool $published): void
+    {
         $post->setTitleAndSlug($title);
         $post->setContent($content);
         if ($published) {
@@ -26,6 +39,5 @@ class PostRepository
         }
         $post->save();
         $post->refresh();
-        return $post;
     }
 }

@@ -3,11 +3,12 @@
 namespace App\Http\Requests;
 
 /**
+ * @property int    $id
  * @property string $title
  * @property string $content
  * @property bool   $is_published
  */
-class CreatePostRequest extends BaseRequest
+class EditPostRequest extends BaseRequest
 {
 
     /**
@@ -18,7 +19,7 @@ class CreatePostRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:posts,title',
+            'title' => 'required|string|max:255|unique:posts,title,' . $this->route('id'),
             'content' => 'required|string|min:10',
             'is_published' => 'required|boolean',
         ];
