@@ -54,10 +54,15 @@ class Post extends Model
 
     public function publish(): void
     {
-        if (!$this->is_published) {
+        if ($this->isNotPublished()) {
             $this->is_published = true;
             $this->published_at = now();
         }
+    }
+
+    private function isNotPublished(): bool
+    {
+        return !$this->is_published && !$this->published_at;
     }
 
 }
