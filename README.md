@@ -122,6 +122,7 @@ Accept:application/json
 Content-Type:application/json
 ```
 Пример для Postman:
+
 ![image info](./docs/headers.png)
 
 ### Создание нового поста (POST /api/posts)
