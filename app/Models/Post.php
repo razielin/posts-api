@@ -65,4 +65,10 @@ class Post extends Model
         return !$this->is_published && !$this->published_at;
     }
 
+    public function unpublish(): void
+    {
+        $this->is_published = false;
+        $this->published_at = null;
+    }
+
 }

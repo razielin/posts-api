@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class Controller
 {
@@ -18,5 +19,10 @@ abstract class Controller
             'success' => false,
             'message' => "Entity #$idsString not found"
         ], 404);
+    }
+
+    protected function failedJson(string $message)
+    {
+        return response()->json(['success' => false, 'message' => $message], Response::HTTP_BAD_REQUEST);
     }
 }

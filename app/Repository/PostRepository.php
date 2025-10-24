@@ -1,6 +1,7 @@
 <?php
 namespace App\Repository;
 
+use App\Http\Requests\EditPostRequest;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -23,10 +24,23 @@ class PostRepository
         return $post;
     }
 
-    public function update(int $id, string $title, string $content, bool $published): Post
+    public function update(int $id, EditPostRequest $request): Post
     {
         $post = $this->findById($id);
-        $this->setPostData($post, $title, $content, $published);
+        if ($request->title) {
+            $post->setTitleAndSlug($request->title);
+        }
+        if ($request->post_content) {
+            $post->setContent($request->post_content);
+        }
+        if ($request->is_published !== null) {
+            if ($request->is_published === true) {
+                $post->publish();
+            } else {
+                $post->unpublish();
+            }
+        }
+        $post->save();
         return $post;
     }
 

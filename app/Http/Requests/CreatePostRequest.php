@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 /**
  * @property string $title
- * @property string $content
+ * @property string $post_content
  * @property bool   $is_published
  */
 class CreatePostRequest extends BaseRequest
@@ -19,7 +19,7 @@ class CreatePostRequest extends BaseRequest
     {
         return [
             'title' => 'required|string|max:255|unique:posts,title',
-            'content' => 'required|string|min:10',
+            'post_content' => 'required|string|min:10',
             'is_published' => 'required|boolean',
         ];
     }

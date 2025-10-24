@@ -28,19 +28,18 @@ class PostController extends Controller
 
     public function createPost(CreatePostRequest $request)
     {
-        $post = $this->postRepository->create($request->title, $request->content, $request->is_published);
+        $post = $this->postRepository->create($request->title, $request->post_content, $request->is_published);
         return $this->successJson($post);
     }
 
     public function editPost(int $id, EditPostRequest $request)
     {
         try {
-            $post = $this->postRepository->update(
-                $id,
-                $request->title,
-                $request->content,
-                $request->is_published
-            );
+            $data = $request->toArray();
+            if (empty($data)) {
+                return $this->failedJson("One or more required parameters are missing");
+            }
+            $post = $this->postRepository->update($id, $request);
             return $this->successJson($post);
         } catch (ModelNotFoundException $e) {
             return $this->notFoundJson($e);

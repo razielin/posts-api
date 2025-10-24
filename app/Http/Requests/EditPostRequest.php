@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 /**
- * @property int    $id
- * @property string $title
- * @property string $content
- * @property bool   $is_published
+ * @property string|null $title
+ * @property string|null $post_content
+ * @property bool|null   $is_published
  */
 class EditPostRequest extends BaseRequest
 {
@@ -19,9 +18,9 @@ class EditPostRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:posts,title,' . $this->route('id'),
-            'content' => 'required|string|min:10',
-            'is_published' => 'required|boolean',
+            'title' => 'sometimes|required|string|max:255|unique:posts,title,' . $this->route('id'),
+            'post_content' => 'sometimes|required|string|min:10',
+            'is_published' => 'sometimes|required|boolean',
         ];
     }
 }

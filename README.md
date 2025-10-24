@@ -132,7 +132,7 @@ POST http://localhost:8000/api/posts
 ```json
 {
     "title": "a test post 6",
-    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    "post_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
     "is_published": true
 }
 ```
@@ -160,7 +160,7 @@ PUT http://localhost:8000/api/posts/1
 ```json
 {
     "title": "a test post",
-    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    "post_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
     "is_published": true
 }
 ```
