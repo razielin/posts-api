@@ -99,31 +99,13 @@ GET http://localhost:8000/api/posts/1
     }
 }
 ```
-## Получение CSRF токена
 ### ВАЖНО!
-Для работы последующих api (для выполнения POST/PUT/DELETE запросов)
-Нужно получить CSRF токен с api:
-
-GET http://localhost:8000/api/token
-
-Пример ответа:
-```
-a5zTzBi3Syn8hJMoJUiRpbQUdrUIYNDY12ZaYD8B
-```
-Данный токен нужно вставить в HTTP заголовок `X-CSRF-TOKEN`:
-```
-X-CSRF-TOKEN:a5zTzBi3Syn8hJMoJUiRpbQUdrUIYNDY12ZaYD8B
-```
-
-Так же для работы всех последующих апи, нужно вставить заголовки
+Для работы всех последующих апи, нужно вставить заголовки
 `Accept` и `Content-Type`:
 ```
 Accept:application/json
 Content-Type:application/json
 ```
-Пример для Postman:
-
-![image info](./docs/headers.png)
 
 ### Создание нового поста (POST /api/posts)
 POST http://localhost:8000/api/posts
@@ -131,7 +113,7 @@ POST http://localhost:8000/api/posts
 Пример body запроса:
 ```json
 {
-    "title": "a test post 6",
+    "title": "a test post",
     "post_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
     "is_published": true
 }
@@ -142,8 +124,43 @@ POST http://localhost:8000/api/posts
     "success": true,
     "data": {
         "id": 7,
-        "title": "a test post 6",
-        "slug": "a-test-post-6",
+        "title": "a test post",
+        "slug": "a-test-post",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+        "is_published": true,
+        "published_at": "2025-10-22T19:44:18.000000Z",
+        "created_at": "2025-10-22T19:44:18.000000Z",
+        "updated_at": "2025-10-22T19:44:18.000000Z"
+    }
+}
+```
+
+При дублировании поля `slug` (при одинаковом `title`)
+, к `slug` добавляется суффикс -1, -2 и т.д.
+
+Пример ответа:
+```json
+{
+    "success": true,
+    "data": {
+        "id": 7,
+        "title": "a test post",
+        "slug": "a-test-post-1",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+        "is_published": true,
+        "published_at": "2025-10-22T19:44:18.000000Z",
+        "created_at": "2025-10-22T19:44:18.000000Z",
+        "updated_at": "2025-10-22T19:44:18.000000Z"
+    }
+}
+```
+```json
+{
+    "success": true,
+    "data": {
+        "id": 8,
+        "title": "a test post",
+        "slug": "a-test-post-2",
         "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
         "is_published": true,
         "published_at": "2025-10-22T19:44:18.000000Z",
@@ -164,6 +181,12 @@ PUT http://localhost:8000/api/posts/1
     "is_published": true
 }
 ```
+Каждое поле опционально, достаточно, чтобы было хотя бы одно поле:
+```json
+{
+    "is_published": true
+}
+```
 Пример ответа:
 ```json
 {
@@ -180,6 +203,8 @@ PUT http://localhost:8000/api/posts/1
     }
 }
 ```
+При дублировании поля `slug` (при одинаковом `title`)
+, к `slug` добавляется суффикс -1, -2 и т.д. (как и при добавлении)
 
 ### Удаление поста (DELETE /api/posts/{id})
 DELETE http://localhost:8000/api/posts/1
