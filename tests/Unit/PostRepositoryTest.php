@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\EditPostRequest;
 use App\Models\Post;
 use App\Repository\PostRepository;
@@ -80,49 +81,52 @@ class PostRepositoryTest extends TestCase
 
     public function test_create_returns_new_post(): void
     {
-        $title = 'New Post Title';
-        $content = 'New post content';
-        $published = true;
+        $request = $this->createMock(CreatePostRequest::class);
+        $request->title = 'New Post Title';
+        $request->post_content = 'New post content';
+        $request->is_published = true;
 
-        $result = $this->repository->create($title, $content, $published);
+        $result = $this->repository->create($request);
 
         $this->assertInstanceOf(Post::class, $result);
-        $this->assertEquals($title, $result->title);
+        $this->assertEquals('New Post Title', $result->title);
         $this->assertEquals('new-post-title', $result->slug);
-        $this->assertEquals($content, $result->content);
+        $this->assertEquals('New post content', $result->content);
         $this->assertTrue($result->is_published);
         $this->assertNotNull($result->published_at);
     }
 
     public function test_create_saves_post_to_database(): void
     {
-        $title = 'Database Test Post';
-        $content = 'Database test content';
-        $published = false;
+        $request = $this->createMock(CreatePostRequest::class);
+        $request->title = 'Database Test Post';
+        $request->post_content = 'Database test content';
+        $request->is_published = false;
 
-        $result = $this->repository->create($title, $content, $published);
+        $result = $this->repository->create($request);
 
         $this->assertDatabaseHas('posts', [
             'id' => $result->id,
-            'title' => $title,
+            'title' => 'Database Test Post',
             'slug' => 'database-test-post',
-            'content' => $content,
+            'content' => 'Database test content',
             'is_published' => false,
         ]);
     }
 
     public function test_create_with_unpublished_post(): void
     {
-        $title = 'Unpublished Post';
-        $content = 'This post is not published';
-        $published = false;
+        $request = $this->createMock(CreatePostRequest::class);
+        $request->title = 'Unpublished Post';
+        $request->post_content = 'This post is not published';
+        $request->is_published = false;
 
-        $result = $this->repository->create($title, $content, $published);
+        $result = $this->repository->create($request);
 
         $this->assertInstanceOf(Post::class, $result);
-        $this->assertEquals($title, $result->title);
+        $this->assertEquals('Unpublished Post', $result->title);
         $this->assertEquals('unpublished-post', $result->slug);
-        $this->assertEquals($content, $result->content);
+        $this->assertEquals('This post is not published', $result->content);
         $this->assertFalse($result->is_published);
         $this->assertNull($result->published_at);
     }
@@ -214,15 +218,16 @@ class PostRepositoryTest extends TestCase
 
     public function test_create_with_special_characters_in_title(): void
     {
-        $title = 'Post with Special Characters! @#$%';
-        $content = 'Content with special characters';
-        $published = false;
+        $request = $this->createMock(CreatePostRequest::class);
+        $request->title = 'Post with Special Characters! @#$%';
+        $request->post_content = 'Content with special characters';
+        $request->is_published = false;
 
-        $result = $this->repository->create($title, $content, $published);
+        $result = $this->repository->create($request);
 
-        $this->assertEquals($title, $result->title);
+        $this->assertEquals('Post with Special Characters! @#$%', $result->title);
         $this->assertEquals('post-with-special-characters-at', $result->slug);
-        $this->assertEquals($content, $result->content);
+        $this->assertEquals('Content with special characters', $result->content);
     }
 
     public function test_update_only_title(): void
@@ -290,5 +295,119 @@ class PostRepositoryTest extends TestCase
         $this->assertEquals('Original content', $result->content); // Не изменилось
         $this->assertTrue($result->is_published);
         $this->assertNotNull($result->published_at);
+    }
+
+    public function test_create_with_duplicate_slug_handles_autoincrement(): void
+    {
+        // Создаем первый пост
+        $firstRequest = $this->createMock(CreatePostRequest::class);
+        $firstRequest->title = 'Test Post';
+        $firstRequest->post_content = 'First post content';
+        $firstRequest->is_published = false;
+
+        $firstPost = $this->repository->create($firstRequest);
+
+        // Создаем второй пост с тем же заголовком
+        $secondRequest = $this->createMock(CreatePostRequest::class);
+        $secondRequest->title = 'Test Post';
+        $secondRequest->post_content = 'Second post content';
+        $secondRequest->is_published = false;
+
+        $secondPost = $this->repository->create($secondRequest);
+
+        $this->assertEquals('test-post', $firstPost->slug);
+        $this->assertEquals('test-post-1', $secondPost->slug);
+    }
+
+    public function test_create_with_multiple_duplicate_slugs(): void
+    {
+        // Создаем несколько постов с одинаковыми заголовками
+        $titles = ['Test Post', 'Test Post', 'Test Post'];
+        $slugs = [];
+
+        foreach ($titles as $index => $title) {
+            $request = $this->createMock(CreatePostRequest::class);
+            $request->title = $title;
+            $request->post_content = "Content $index";
+            $request->is_published = false;
+
+            $post = $this->repository->create($request);
+            $slugs[] = $post->slug;
+        }
+
+        $this->assertEquals('test-post', $slugs[0]);
+        $this->assertEquals('test-post-1', $slugs[1]);
+        $this->assertEquals('test-post-2', $slugs[2]);
+    }
+
+    public function test_update_with_null_fields_does_not_change_existing(): void
+    {
+        $originalPost = Post::create([
+            'title' => 'Original Title',
+            'slug' => 'original-title',
+            'content' => 'Original content',
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+
+        $request = $this->createMock(EditPostRequest::class);
+        $request->title = null;
+        $request->post_content = null;
+        $request->is_published = null;
+
+        $result = $this->repository->update($originalPost->id, $request);
+
+        $this->assertEquals('Original Title', $result->title);
+        $this->assertEquals('original-title', $result->slug);
+        $this->assertEquals('Original content', $result->content);
+        $this->assertTrue($result->is_published);
+        $this->assertNotNull($result->published_at);
+    }
+
+    public function test_update_with_partial_fields(): void
+    {
+        $originalPost = Post::create([
+            'title' => 'Original Title',
+            'slug' => 'original-title',
+            'content' => 'Original content',
+            'is_published' => false,
+        ]);
+
+        $request = $this->createMock(EditPostRequest::class);
+        $request->title = 'Updated Title';
+        $request->post_content = null; // Не обновляем контент
+        $request->is_published = true; // Обновляем статус
+
+        $result = $this->repository->update($originalPost->id, $request);
+
+        $this->assertEquals('Updated Title', $result->title);
+        $this->assertEquals('updated-title', $result->slug);
+        $this->assertEquals('Original content', $result->content); // Не изменился
+        $this->assertTrue($result->is_published);
+        $this->assertNotNull($result->published_at);
+    }
+
+    public function test_update_with_unpublish(): void
+    {
+        $originalPost = Post::create([
+            'title' => 'Original Title',
+            'slug' => 'original-title',
+            'content' => 'Original content',
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+
+        $request = $this->createMock(EditPostRequest::class);
+        $request->title = null;
+        $request->post_content = null;
+        $request->is_published = false;
+
+        $result = $this->repository->update($originalPost->id, $request);
+
+        $this->assertEquals('Original Title', $result->title);
+        $this->assertEquals('original-title', $result->slug);
+        $this->assertEquals('Original content', $result->content);
+        $this->assertFalse($result->is_published);
+        $this->assertNull($result->published_at);
     }
 }
