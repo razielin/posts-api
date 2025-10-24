@@ -47,6 +47,23 @@ class Post extends Model
         $this->slug = Str::slug($title);
     }
 
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function generateAutoincrementedSlug(string $previousSlug): void
+    {
+        $words = explode('-', $previousSlug);
+        $lastWord = array_pop($words);
+        $slugCounter = is_numeric($lastWord) ? (int)$lastWord + 1 : 1;
+        if (!is_numeric($lastWord)) {
+            $words[] = $lastWord;
+        }
+        $words[] = $slugCounter;
+        $this->slug = implode('-', $words);
+    }
+
     public function setContent(string $content): void
     {
         $this->content = $content;

@@ -28,7 +28,7 @@ class PostController extends Controller
 
     public function createPost(CreatePostRequest $request)
     {
-        $post = $this->postRepository->create($request->title, $request->post_content, $request->is_published);
+        $post = $this->postRepository->create($request);
         return $this->successJson($post);
     }
 

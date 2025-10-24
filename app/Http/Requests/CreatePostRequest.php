@@ -18,7 +18,7 @@ class CreatePostRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:posts,title',
+            'title' => 'required|string|max:255',
             'post_content' => 'required|string|min:10',
             'is_published' => 'required|boolean',
         ];

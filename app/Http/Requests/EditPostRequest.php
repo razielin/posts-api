@@ -18,7 +18,7 @@ class EditPostRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required|string|max:255|unique:posts,title,' . $this->route('id'),
+            'title' => 'sometimes|required|string|max:255',
             'post_content' => 'sometimes|required|string|min:10',
             'is_published' => 'sometimes|required|boolean',
         ];
